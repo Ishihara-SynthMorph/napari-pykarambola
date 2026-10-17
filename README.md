@@ -13,7 +13,87 @@ Compute Minkowski tensors (shape and morphology descriptors) on segmented 3D obj
 
 ----------------------------------
 
-This [napari] plugin was generated with [copier] using the [napari-plugin-template] (None).
+`napari-pykarambola` is a thin [napari] widget around [pykarambola], a Python
+implementation of the C++ [karambola] package for computing Minkowski
+tensors — surface-integral shape descriptors from integral geometry — on 3D
+triangulated meshes.
+Point the widget at a `Labels` layer and it extracts a mesh for every
+object (via marching cubes), computes its Minkowski tensors, and writes a
+flat per-object scalar feature table to `labels_layer.features`.
+
+### Why Minkowski tensors
+
+Popular napari morphology tools such as [napari-skimage-regionprops]
+compute descriptors like eccentricity, solidity, or Feret diameter, which
+are fits to a reference shape (best-fit ellipsoid, convex hull) and work
+best on simple, roughly-convex, blob-like 3D objects.
+Minkowski tensors are surface integrals: they stay well-defined and
+rotation-covariant regardless of topology, so they also work for
+non-convex, high-genus, or branching objects where a best-fit-ellipsoid
+description breaks down.
+This plugin is meant to complement regionprops-style tools, not replace
+them — reach for it when your objects are topologically complex and an
+ellipsoid or convex-hull fit would throw away the shape information you
+care about.
+
+### What the widget outputs
+
+The widget runs `pykarambola.api.minkowski_tensors_from_label_image` on the
+chosen `Labels` layer and writes one row per label to
+`labels_layer.features`, with a `label` column plus the following scalar
+columns:
+
+- **Base scalar functionals** — `w000`, `w100`, `w200`, `w300` (volume,
+  surface area / 3, integrated mean curvature / 3, and 2π × Euler
+  characteristic / 3 — see [pykarambola]'s README for the full
+  normalization convention).
+- **`*_beta`** — anisotropy index (ratio of smallest to largest eigenvalue
+  magnitude) for each rank-2 tensor in the family `w020`, `w120`, `w220`,
+  `w320`, `w102`, `w202`.
+- **`*_trace`** — the matrix trace of each of those rank-2 tensors.
+- **`*_trace_ratio`** — trace divided by the corresponding Minkowski
+  scalar (e.g. `w020_trace_ratio = Tr(w020) / w000`).
+
+Choosing `compute='standard'` restricts the widget to the base scalars and
+their `w220`/`w102`/`w202`-derived quantities, while `compute='all'` adds
+the full rank-2 tensor family above.
+Full tensors, eigenvectors, and the per-degree `msm_ql`/`msm_wl`
+spherical-harmonic arrays that pykarambola can also compute are
+deliberately **not** flattened into the table — they don't fit as scalar
+columns — so use pykarambola directly if you need those.
+
+## Usage
+
+1. Load a `Labels` layer (your own segmentation, or `File > Open Sample >
+   napari-pykarambola > pykarambola sample labels` for a synthetic example
+   with a near-spherical blob and a dumbbell shape, so you can immediately
+   see a visible anisotropy difference in e.g. `w220_beta`).
+2. Open the widget from napari's `Plugins` menu (or the `napari/layers/segment`
+   menu), under **Minkowski tensors**.
+3. Pick the `Labels` layer and a `compute` mode (`standard` or `all`).
+4. Click **Compute Minkowski tensors**.
+
+Results are written to the Labels layer's `features` table, viewable via
+napari's built-in features/table viewer or exported to CSV from there.
+
+## Relationship to other napari plugins
+
+- **[napari-skimage-regionprops]** — computes classic shape descriptors
+  (eccentricity, solidity, Feret diameter, etc.); this plugin is a
+  complementary source of topology-robust shape descriptors for objects
+  where those ellipsoid/hull-based fits are less meaningful.
+- **[napari-clusters-plotter]** — consumes per-object feature columns for
+  dimensionality reduction and clustering (e.g. UMAP); the feature table
+  written by this plugin follows the same `layer.features` contract, so
+  Minkowski tensor columns can be clustered directly.
+- **[napari-feature-classifier]** — provides random-forest-assisted
+  annotation over a feature table that requires `label` and `roi_id`
+  columns; this plugin's table already has `label`, but **not** `roi_id`
+  yet, so a `roi_id` column would need to be added for full compatibility.
+
+----------------------------------
+
+This [napari] plugin was generated with [copier] using the [napari-plugin-template].
 
 <!--
 Don't miss the full getting started guide to set up your new package:
@@ -62,6 +142,11 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 
 [napari]: https://github.com/napari/napari
 [copier]: https://copier.readthedocs.io/en/stable/
+[pykarambola]: https://github.com/Ishihara-SynthMorph/pykarambola
+[karambola]: https://github.com/morphometry/karambola
+[napari-skimage-regionprops]: https://github.com/haesleinhuepf/napari-skimage-regionprops
+[napari-clusters-plotter]: https://github.com/BiAPoL/napari-clusters-plotter
+[napari-feature-classifier]: https://github.com/fractal-napari-plugins-collection/napari-feature-classifier
 [MIT]: http://opensource.org/licenses/MIT
 [BSD-3]: http://opensource.org/licenses/BSD-3-Clause
 [GNU GPL v3.0]: http://www.gnu.org/licenses/gpl-3.0.txt
