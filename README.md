@@ -76,6 +76,16 @@ columns — so use pykarambola directly if you need those.
 Results are written to the Labels layer's `features` table, viewable via
 napari's built-in features/table viewer or exported to CSV from there.
 
+### Visualizing as a Surface
+
+After computing, pick a scalar from **Color surface by** (any column
+written to `features`, e.g. `w220_beta`) and click **Visualize as
+Surface** to add a `Surface` layer built from the same per-label meshes
+`marching_cubes` already produced during the tensor computation — no
+mesh is extracted twice. Each object's vertices are colored by that
+object's scalar value, so e.g. coloring by `w220_beta` immediately shows
+which objects are more anisotropic.
+
 ## Relationship to other napari plugins
 
 - **[napari-skimage-regionprops]** — computes classic shape descriptors
