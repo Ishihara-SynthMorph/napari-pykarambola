@@ -8,36 +8,17 @@ contributions:
   commands:
     - id: napari-pykarambola.make_sample_data
       python_name: napari_pykarambola._sample_data:make_sample_data
-      title: Load sample data from pykarambola
-    - id: napari-pykarambola.make_container_widget
-      python_name: napari_pykarambola._widget:ImageThreshold
-      title: Make threshold Container widget
-    - id: napari-pykarambola.make_magic_widget
-      python_name: napari_pykarambola._widget:threshold_magic_widget
-      title: Make threshold magic widget
-    - id: napari-pykarambola.make_function_widget
-      python_name: napari_pykarambola._widget:threshold_autogenerate_widget
-      title: Make threshold function widget
-    - id: napari-pykarambola.make_qwidget
-      python_name: napari_pykarambola._widget:ExampleQWidget
-      title: Make example QWidget
+      title: Load sample label image from pykarambola
+    - id: napari-pykarambola.make_minkowski_widget
+      python_name: napari_pykarambola._widget:MinkowskiTensorWidget
+      title: Compute Minkowski tensors
   sample_data:
     - command: napari-pykarambola.make_sample_data
-      display_name: pykarambola
+      display_name: pykarambola sample labels
       key: unique_id.1
   widgets:
-    - command: napari-pykarambola.make_container_widget
-      display_name: Container Threshold
-    - command: napari-pykarambola.make_magic_widget
-      display_name: Magic Threshold
-    - command: napari-pykarambola.make_function_widget
-      autogenerate: true
-      display_name: Autogenerate Threshold
-    - command: napari-pykarambola.make_qwidget
-      display_name: Example QWidget
+    - command: napari-pykarambola.make_minkowski_widget
+      display_name: Minkowski tensors
   menus:
     napari/layers/segment:
-      - command: napari-pykarambola.make_container_widget
-      - command: napari-pykarambola.make_magic_widget
-      - command: napari-pykarambola.make_function_widget
-      - command: napari-pykarambola.make_qwidget
+      - command: napari-pykarambola.make_minkowski_widget
