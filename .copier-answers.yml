@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v2.3.0
+_src_path: /tmp/napari-plugin-template
+display_name: pykarambola
+email: keisuke.ishihara@gmail.com
+full_name: Keisuke Ishihara
+github_repository_url: https://github.com/Ishihara-SynthMorph/napari-pykarambola
+github_username_or_organization: Ishihara-SynthMorph
+include_reader_plugin: false
+include_sample_data_plugin: true
+include_widget_plugin: true
+include_writer_plugin: false
+install_dependabot: true
+install_precommit: true
+license: BSD-3
+module_name: napari_pykarambola
+plugin_name: napari-pykarambola
+short_description: Compute Minkowski tensors (shape and morphology descriptors) on
+    segmented 3D objects
