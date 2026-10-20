@@ -106,13 +106,19 @@ class MinkowskiTensorWidget(Container):
         all_labels = np.unique(labels_layer.data)
         all_labels = all_labels[all_labels != 0]
         features = features.reindex(all_labels).reset_index()
+        # napari-feature-classifier requires both `label` and `roi_id`.
+        # This widget always operates on a single Labels layer, so the
+        # layer's name is the natural per-image identifier.
+        features['roi_id'] = labels_layer.name
         labels_layer.features = features
 
         self._last_labels_layer = labels_layer
         self._last_results = results
         self._last_meshes = meshes
 
-        scalar_columns = [c for c in features.columns if c != 'label']
+        scalar_columns = [
+            c for c in features.columns if c not in ('label', 'roi_id')
+        ]
         self._color_combo.choices = scalar_columns
         if scalar_columns:
             self._color_combo.value = scalar_columns[0]
