@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 from magicgui.widgets import ComboBox, Container, PushButton, create_widget
+from napari.qt.threading import thread_worker
+from napari.utils.notifications import show_error
 
 if TYPE_CHECKING:
     import napari
@@ -23,6 +25,36 @@ def _extract_scalars(label_result: dict) -> dict:
         if key in _SCALAR_BASE or key.endswith(_SCALAR_SUFFIXES):
             scalars[key] = float(value)
     return scalars
+
+
+@thread_worker
+def _compute_minkowski_tensors(
+    label_data: np.ndarray, compute: str, spacing: tuple
+):
+    """Run the (potentially slow) Minkowski tensor computation.
+
+    Executed off the main/GUI thread by ``thread_worker``, so this must
+    not touch any Qt/widget state directly -- only plain data in, plain
+    data out.
+    """
+    from pykarambola.api import minkowski_tensors_from_label_image
+
+    # return_meshes=True reuses the marching_cubes mesh already
+    # produced internally, so visualizing as a Surface afterwards
+    # doesn't re-run marching_cubes.
+    #
+    # spacing carries the layer's physical voxel spacing in the same
+    # (Z, Y, X) axis order as label_data, which matches the (sz, sy, sx)
+    # convention minkowski_tensors_from_label_image's spacing parameter
+    # forwards unchanged to marching_cubes -- so no axis reordering is
+    # needed here.
+    results, meshes = minkowski_tensors_from_label_image(
+        label_data,
+        compute=compute,
+        spacing=spacing,
+        return_meshes=True,
+    )
+    return results, meshes
 
 
 class MinkowskiTensorWidget(Container):
@@ -44,6 +76,7 @@ class MinkowskiTensorWidget(Container):
         self._last_labels_layer = None
         self._last_results = None
         self._last_meshes = None
+        self._worker = None
 
         self._labels_combo = create_widget(
             label='Labels layer', annotation='napari.layers.Labels'
@@ -71,27 +104,25 @@ class MinkowskiTensorWidget(Container):
         )
 
     def _run(self):
-        from pykarambola.api import minkowski_tensors_from_label_image
-
         labels_layer = self._labels_combo.value
         if labels_layer is None:
             return
 
-        # return_meshes=True reuses the marching_cubes mesh already
-        # produced internally, so visualizing as a Surface afterwards
-        # doesn't re-run marching_cubes.
-        #
-        # labels_layer.scale carries the layer's physical voxel spacing in
-        # the same (Z, Y, X) axis order as labels_layer.data, which matches
-        # the (sz, sy, sx) convention minkowski_tensors_from_label_image's
-        # spacing parameter forwards unchanged to marching_cubes -- so no
-        # axis reordering is needed here.
-        results, meshes = minkowski_tensors_from_label_image(
+        self._run_button.enabled = False
+
+        self._worker = _compute_minkowski_tensors(
             labels_layer.data,
-            compute=self._compute_combo.value,
-            spacing=tuple(labels_layer.scale),
-            return_meshes=True,
+            self._compute_combo.value,
+            tuple(labels_layer.scale),
         )
+        self._worker.returned.connect(
+            lambda result: self._on_computed(labels_layer, result)
+        )
+        self._worker.errored.connect(self._on_run_errored)
+        self._worker.start()
+
+    def _on_computed(self, labels_layer, result):
+        results, meshes = result
 
         rows = []
         for label_id, label_result in results.items():
@@ -123,6 +154,12 @@ class MinkowskiTensorWidget(Container):
         if scalar_columns:
             self._color_combo.value = scalar_columns[0]
         self._surface_button.enabled = bool(meshes)
+
+        self._run_button.enabled = True
+
+    def _on_run_errored(self, exception):
+        self._run_button.enabled = True
+        show_error(f'Minkowski tensor computation failed: {exception}')
 
     def _add_surface(self):
         from pykarambola.api import combine_label_meshes
