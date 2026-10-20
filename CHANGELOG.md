@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `roi_id` column in `labels_layer.features`, set to the Labels layer's
+  name, for compatibility with napari-feature-classifier (which requires
+  both `label` and `roi_id`).
 - `MinkowskiTensorWidget` can now add a `Surface` layer built from the
   per-label meshes computed internally, colored by any scalar written to
   `labels_layer.features` (e.g. `w220_beta`). Requires pykarambola>=0.7.0,
@@ -27,6 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   button is disabled while a computation is running and re-enabled on
   completion or error; errors are surfaced via
   `napari.utils.notifications.show_error` instead of being swallowed.
+
+### Fixed
+
+- `MinkowskiTensorWidget` now passes the Labels layer's voxel scale
+  (`labels_layer.scale`) through to `minkowski_tensors_from_label_image` as
+  `spacing`, so anisotropic-voxel images (e.g. light-sheet or widefield
+  Z-stacks) produce physically-correct volume/area/curvature values instead
+  of silently assuming isotropic unit spacing
+  ([#4](https://github.com/Ishihara-SynthMorph/napari-pykarambola/issues/4)).
 
 ## [0.1.0]
 
