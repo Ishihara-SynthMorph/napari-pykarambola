@@ -137,8 +137,8 @@ This opens napari with the membrane/nuclei channels and the resulting
   Minkowski tensor columns can be clustered directly.
 - **[napari-feature-classifier]** — provides random-forest-assisted
   annotation over a feature table that requires `label` and `roi_id`
-  columns; this plugin's table already has `label`, but **not** `roi_id`
-  yet, so a `roi_id` column would need to be added for full compatibility.
+  columns; this plugin's table provides both, with `roi_id` set to the
+  Labels layer's name.
 
 ----------------------------------
 

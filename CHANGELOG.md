@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `roi_id` column in `labels_layer.features`, set to the Labels layer's
+  name, for compatibility with napari-feature-classifier (which requires
+  both `label` and `roi_id`).
 - `MinkowskiTensorWidget` can now add a `Surface` layer built from the
   per-label meshes computed internally, colored by any scalar written to
   `labels_layer.features` (e.g. `w220_beta`). Requires pykarambola>=0.7.0,
