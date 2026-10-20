@@ -86,6 +86,45 @@ mesh is extracted twice. Each object's vertices are colored by that
 object's scalar value, so e.g. coloring by `w220_beta` immediately shows
 which objects are more anisotropic.
 
+## Demo: real nuclei segmentation
+
+The synthetic sample data (one sphere, one dumbbell) is good for a
+quick sanity check, but a real segmentation makes the point better.
+[`demo.py`] in this repo segments the nuclei channel of
+[scikit-image's `cells3d`][cells3d] sample — the same dataset
+[napari-skimage-regionprops] uses in its own tutorials — into ~19 real,
+non-trivially-shaped nuclei via Gaussian smoothing, Otsu thresholding,
+and a distance-transform watershed:
+
+```bash
+python demo.py
+```
+
+This opens napari with the membrane/nuclei channels and the resulting
+`Labels` layer. From there:
+
+1. Open **Minkowski tensors** from the `Plugins` menu, pick the `nuclei
+   segmentation` layer, set `Compute` to `all`, and click **Compute
+   Minkowski tensors**. Unlike the two-object synthetic sample,
+   `w220_beta` now spreads meaningfully across real nuclei (roughly
+   0.12 to 0.45 in a typical run), so it's a genuinely informative
+   scalar to inspect.
+2. Set **Color surface by** to `w220_beta` and click **Visualize as
+   Surface**:
+
+   ![Surface layer colored by w220_beta, showing anisotropy variation across segmented nuclei](images/surface_demo.png)
+
+   Each nucleus is a uniform color (one value per label), and the
+   spread of colors across the population reflects real shape
+   variation — the yellow and purple nuclei above are the most
+   anisotropic in this run.
+3. For comparison, install [napari-skimage-regionprops] and run its
+   `regionprops` widget on the same `nuclei segmentation` layer. It
+   reports ellipsoid/hull-based descriptors (eccentricity, solidity,
+   etc.) side by side with this plugin's topology-robust `w220_beta` —
+   a direct illustration of the complementary relationship described
+   below.
+
 ## Relationship to other napari plugins
 
 - **[napari-skimage-regionprops]** — computes classic shape descriptors
@@ -154,6 +193,8 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [copier]: https://copier.readthedocs.io/en/stable/
 [pykarambola]: https://github.com/Ishihara-SynthMorph/pykarambola
 [karambola]: https://github.com/morphometry/karambola
+[`demo.py`]: demo.py
+[cells3d]: https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.cells3d
 [napari-skimage-regionprops]: https://github.com/haesleinhuepf/napari-skimage-regionprops
 [napari-clusters-plotter]: https://github.com/BiAPoL/napari-clusters-plotter
 [napari-feature-classifier]: https://github.com/fractal-napari-plugins-collection/napari-feature-classifier

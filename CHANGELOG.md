@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `labels_layer.features` (e.g. `w220_beta`). Requires pykarambola>=0.7.0,
   which ships `return_meshes`/`combine_label_meshes`
   ([pykarambola#176](https://github.com/Ishihara-SynthMorph/pykarambola/pull/176)).
+- README demo walking through the Surface visualization on a real
+  segmentation (`demo.py`, segmenting scikit-image's `cells3d` nuclei
+  channel), with a comparison callout to napari-skimage-regionprops.
 
 ## [0.1.0]
 
