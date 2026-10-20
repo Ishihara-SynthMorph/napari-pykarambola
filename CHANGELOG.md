@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   segmentation (`demo.py`, segmenting scikit-image's `cells3d` nuclei
   channel), with a comparison callout to napari-skimage-regionprops.
 
+### Changed
+
+- `MinkowskiTensorWidget` now runs `minkowski_tensors_from_label_image`
+  in a background thread via `napari.qt.threading.thread_worker`
+  instead of blocking the GUI thread, so label images with many objects
+  no longer freeze the napari UI. The **Compute Minkowski tensors**
+  button is disabled while a computation is running and re-enabled on
+  completion or error; errors are surfaced via
+  `napari.utils.notifications.show_error` instead of being swallowed.
+
 ## [0.1.0]
 
 ### Added
