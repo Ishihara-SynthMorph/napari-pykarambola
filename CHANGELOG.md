@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `MinkowskiTensorWidget` can now add a `Surface` layer built from the
   per-label meshes computed internally, colored by any scalar written to
-  `labels_layer.features` (e.g. `w220_beta`). Requires a pykarambola
-  release with `return_meshes`/`combine_label_meshes`
-  ([pykarambola#175](https://github.com/Ishihara-SynthMorph/pykarambola/pull/175)).
+  `labels_layer.features` (e.g. `w220_beta`). Requires pykarambola>=0.7.0,
+  which ships `return_meshes`/`combine_label_meshes`
+  ([pykarambola#176](https://github.com/Ishihara-SynthMorph/pykarambola/pull/176)).
 
 ## [0.1.0]
 

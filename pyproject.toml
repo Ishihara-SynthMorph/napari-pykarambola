@@ -34,7 +34,7 @@ dependencies = [
     "magicgui",
     "qtpy",
     "scikit-image",
-    "pykarambola>=0.6.1",
+    "pykarambola>=0.7.0",
 ]
 
 [project.optional-dependencies]
