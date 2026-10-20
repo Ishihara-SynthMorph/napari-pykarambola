@@ -21,6 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   segmentation (`demo.py`, segmenting scikit-image's `cells3d` nuclei
   channel), with a comparison callout to napari-skimage-regionprops.
 
+### Fixed
+
+- `MinkowskiTensorWidget` now passes the Labels layer's voxel scale
+  (`labels_layer.scale`) through to `minkowski_tensors_from_label_image` as
+  `spacing`, so anisotropic-voxel images (e.g. light-sheet or widefield
+  Z-stacks) produce physically-correct volume/area/curvature values instead
+  of silently assuming isotropic unit spacing
+  ([#4](https://github.com/Ishihara-SynthMorph/napari-pykarambola/issues/4)).
+
 ## [0.1.0]
 
 ### Added

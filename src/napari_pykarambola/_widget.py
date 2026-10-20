@@ -80,9 +80,16 @@ class MinkowskiTensorWidget(Container):
         # return_meshes=True reuses the marching_cubes mesh already
         # produced internally, so visualizing as a Surface afterwards
         # doesn't re-run marching_cubes.
+        #
+        # labels_layer.scale carries the layer's physical voxel spacing in
+        # the same (Z, Y, X) axis order as labels_layer.data, which matches
+        # the (sz, sy, sx) convention minkowski_tensors_from_label_image's
+        # spacing parameter forwards unchanged to marching_cubes -- so no
+        # axis reordering is needed here.
         results, meshes = minkowski_tensors_from_label_image(
             labels_layer.data,
             compute=self._compute_combo.value,
+            spacing=tuple(labels_layer.scale),
             return_meshes=True,
         )
 
